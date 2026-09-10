@@ -90,7 +90,7 @@ done
 rm -rf ./kernels
 mkdir ./kernels
 
-chromeos_version="R122"
+chromeos_version="R151"
 kernels="6.1"
 download_and_patch_kernels
 
