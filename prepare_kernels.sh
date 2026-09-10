@@ -63,8 +63,8 @@ for kernel in $kernels; do
 			tar -C "./kernels/chromebook-$kernel" -zxf "./kernels/chromiumos-$kernel.tar.gz" || { echo "Kernel $kernel source extraction failed"; exit 1; }
 			tar -C "./kernels/$kernel" -zxf "./kernels/chromiumos-$kernel.tar.gz" || { echo "Kernel $kernel source extraction failed"; exit 1; }
 			rm -f "./kernels/chromiumos-$kernel.tar.gz"
-			apply_patches "chromebook-$kernel"
-			make_config "chromebook-$kernel" "chromebook"
+			#apply_patches "chromebook-$kernel"
+			#make_config "chromebook-$kernel" "chromebook"
 			apply_patches "$kernel"
 			make_config "$kernel" "generic"
 		;;
