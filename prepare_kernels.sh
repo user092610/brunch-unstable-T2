@@ -2,7 +2,7 @@
 
 apply_patches()
 {
-for patch_type in "base" "others" "chromeos" "all_devices" "surface_devices" "surface_go_devices" "surface_mwifiex_pcie_devices" "surface_np3_devices" "macbook"; do
+for patch_type in "base" "others" "chromeos" "all_devices" "macbook"; do
 	if [ -d "./kernel-patches/$1/$patch_type" ]; then
 		for patch in ./kernel-patches/"$1/$patch_type"/*.patch; do
 			echo "Applying patch: $patch"
@@ -10,7 +10,12 @@ for patch_type in "base" "others" "chromeos" "all_devices" "surface_devices" "su
 		done
 	fi
 done
+echo "Manually patching intel-lpss-pci.c using file from kernel 5.10..."
+mv ./kernel-patches/intel-lpss-pci.c ./kernels/chromebook-6.1/drivers/mfd/intel-lpss-pci.c
+echo "Patched."
 }
+
+
 
 make_config()
 {
@@ -45,7 +50,7 @@ for kernel in $kernels; do
 			apply_patches "experimental-$kernel"
 			make_config "experimental-$kernel" "generic"
 		;;
-		6.12|6.6)
+		6.12|6.6|6.1)
 			kernel_remote_path="$(git ls-remote https://chromium.googlesource.com/chromiumos/third_party/kernel/ | grep "refs/heads/release-$chromeos_version" | head -1 | sed -e 's#.*\t##' -e 's#chromeos-.*##' | sort -u)chromeos-"
 			[ ! "x$kernel_remote_path" == "x" ] || { echo "Remote path not found"; exit 1; }
 			echo "kernel_remote_path=$kernel_remote_path"
@@ -85,7 +90,7 @@ done
 rm -rf ./kernels
 mkdir ./kernels
 
-chromeos_version="R153"
-kernels="6.6 6.12 6.18"
+chromeos_version="R122"
+kernels="6.1"
 download_and_patch_kernels
 
