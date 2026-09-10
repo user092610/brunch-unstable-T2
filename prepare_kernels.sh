@@ -50,7 +50,7 @@ for kernel in $kernels; do
 			apply_patches "experimental-$kernel"
 			make_config "experimental-$kernel" "generic"
 		;;
-		6.12|6.6|6.1)
+		6.1)
 			kernel_remote_path="$(git ls-remote https://chromium.googlesource.com/chromiumos/third_party/kernel/ | grep "refs/heads/release-$chromeos_version" | head -1 | sed -e 's#.*\t##' -e 's#chromeos-.*##' | sort -u)chromeos-"
 			[ ! "x$kernel_remote_path" == "x" ] || { echo "Remote path not found"; exit 1; }
 			echo "kernel_remote_path=$kernel_remote_path"
