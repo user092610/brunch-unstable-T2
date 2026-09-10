@@ -6,12 +6,12 @@ for patch_type in "base" "others" "chromeos" "all_devices" "macbook"; do
 	if [ -d "./kernel-patches/$1/$patch_type" ]; then
 		for patch in ./kernel-patches/"$1/$patch_type"/*.patch; do
 			echo "Applying patch: $patch"
-			patch -d"./kernels/$1" -p1 --no-backup-if-mismatch -N < "$patch" || { echo "Kernel $1 patch failed"; exit 1; }
+			patch -d"./kernels/$1" -p1 --no-backup-if-mismatch -N < "$patch" || { echo "Kernel $1 patch failed";}
 		done
 	fi
 done
 echo "Manually patching intel-lpss-pci.c using file from kernel 5.10..."
-mv ./kernel-patches/intel-lpss-pci.c ./kernels/chromebook-6.1/drivers/mfd/intel-lpss-pci.c
+cp ./kernel-patches/intel-lpss-pci.c ./kernels/chromebook-6.1/drivers/mfd/intel-lpss-pci.c
 echo "Patched."
 }
 
