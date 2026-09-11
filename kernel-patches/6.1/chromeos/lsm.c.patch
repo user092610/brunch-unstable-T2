@@ -1,0 +1,11 @@
+--- lsm.c	2026-09-11 05:09:52.093941054 +0200
++++ lsm.c.new	2026-09-11 05:11:37.139940654 +0200
+@@ -81,7 +81,7 @@
+ 					void *data)
+ {
+ 	if (!allow_overlayfs && type && !strcmp(type, "overlay")) {
+-		report("sb_mount", path, "Overlayfs mounts prohibited");
++		pr_warn("chromiumos_lsm: sb_mount: Overlayfs mounts prohibited");
+ 		pr_notice("sb_mount dev=%s type=%s flags=%#lx\n",
+ 			  dev_name, type, flags);
+ 		return -EPERM;
