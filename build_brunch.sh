@@ -100,7 +100,7 @@ cp -r ./kernels/"$kernel" ./chroot/tmp/kernel || { echo "Failed to copy source f
 cd ./chroot/tmp/kernel || { echo "Failed to enter source directory for kernel $kernel"; exit 1; }
 kernel_version="$(file ./out/arch/x86/boot/bzImage | cut -d' ' -f9)"
 [ ! "$kernel_version" == "" ] || { echo "Failed to read version for kernel $kernel"; exit 1; }
-cp ./out/arch/x86/boot/bzImage ../../home/chronos/rootc/kernel-"$kernel" || { echo "Failed to copy the kernel $kernel"; exit 1; }
+cp --remove-destination ./out/arch/x86/boot/bzImage ../../home/chronos/rootc/kernel-"$kernel" || { echo "Failed to copy the kernel $kernel"; exit 1; }
 make -j"$NTHREADS" O=out INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=../../../home/chronos/kernel modules_install || { echo "Failed to install modules for kernel $kernel"; exit 1; }
 rm -f ../../home/chronos/kernel/lib/modules/"$kernel_version"/build || { echo "Failed to remove the build directory for kernel $kernel"; exit 1; }
 rm -f ../../home/chronos/kernel/lib/modules/"$kernel_version"/source || { echo "Failed to remove the source directory for kernel $kernel"; exit 1; }
