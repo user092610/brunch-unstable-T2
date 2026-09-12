@@ -26,7 +26,7 @@ if [ -f ../chromiumos-stage3/chromiumos_stage3.tar.gz ]; then
 	echo "Using local ChromiumOS Stage3"
 	cp ../chromiumos-stage3/chromiumos_stage3.tar.gz ./out/chromiumos_stage3.tar.gz || { echo "Failed to copy the brunch toolchain"; exit 1; }
 else
-	curl -L https://github.com/sebanc/chromiumos-stage3/releases/download/r151-20260812/chromiumos_stage3_r151_20260812.tar.gz -o ./out/chromiumos_stage3.tar.gz || { echo "Failed to download the brunch toolchain"; exit 1; }
+	curl -L https://github.com/sebanc/chromiumos-stage3/releases/download/r152-20260912/chromiumos_stage3_r152_20260912.tar.gz -o ./out/chromiumos_stage3.tar.gz || { echo "Failed to download the brunch toolchain"; exit 1; }
 fi
 tar zxf ./out/chromiumos_stage3.tar.gz -C ./chroot || { echo "Failed to extract the brunch toolchain"; exit 1; }
 rm -f ./out/chromiumos_stage3.tar.gz
@@ -43,7 +43,7 @@ if [ ! -z $1 ] && [ "$1" != "skip" ] ; then
 else
 	git clone --depth=1 -b master https://github.com/sebanc/chromeos-ota-extract.git rootfs || { echo "Failed to clone chromeos-ota-extract"; exit 1; }
 	cd rootfs
-	curl -L https://dl.google.com/chromeos/reven/16733.48.0/stable-channel/chromeos_16733.48.0_reven_stable-channel_full_RevenMPKeys-v11.bin-gzqtoyldgnswcjdxr6lvbmkbd63d6lvt.signed -o ./update.signed || { echo "Failed to Download the OTA update"; exit 1; }
+	curl -L https://dl.google.com/chromeos/reven/16765.41.0/stable-channel/chromeos_16765.41.0_reven_stable-channel_full_RevenMPKeys-v11.bin-gzqtsyjygm2dgk3rqziggdwealsk7daj.signed -o ./update.signed || { echo "Failed to Download the OTA update"; exit 1; }
 	PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python python3 extract_android_ota_payload.py ./update.signed || { echo "Failed to extract the OTA update"; exit 1; }
 	cd ..
 	[ -f ./rootfs/root.img ] || { echo "ChromeOS rootfs has not been extracted"; exit 1; }
@@ -100,7 +100,7 @@ cp -r ./kernels/"$kernel" ./chroot/tmp/kernel || { echo "Failed to copy source f
 cd ./chroot/tmp/kernel || { echo "Failed to enter source directory for kernel $kernel"; exit 1; }
 kernel_version="$(file ./out/arch/x86/boot/bzImage | cut -d' ' -f9)"
 [ ! "$kernel_version" == "" ] || { echo "Failed to read version for kernel $kernel"; exit 1; }
-cp --remove-destination ./out/arch/x86/boot/bzImage ../../home/chronos/rootc/kernel-"$kernel" || { echo "Failed to copy the kernel $kernel"; exit 1; }
+cp ./out/arch/x86/boot/bzImage ../../home/chronos/rootc/kernel-"$kernel" || { echo "Failed to copy the kernel $kernel"; exit 1; }
 make -j"$NTHREADS" O=out INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=../../../home/chronos/kernel modules_install || { echo "Failed to install modules for kernel $kernel"; exit 1; }
 rm -f ../../home/chronos/kernel/lib/modules/"$kernel_version"/build || { echo "Failed to remove the build directory for kernel $kernel"; exit 1; }
 rm -f ../../home/chronos/kernel/lib/modules/"$kernel_version"/source || { echo "Failed to remove the source directory for kernel $kernel"; exit 1; }
@@ -111,114 +111,7 @@ cd ../../..
 
 if [ "$1" != "skip" ] && [ "$2" != "skip" ]; then
 
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8188eu ./chroot/tmp/ || { echo "Failed to build external rtl8188eu module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8188eu || { echo "Failed to build external rtl8188eu module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8188eu module for kernel $kernel"; exit 1; }
-cp ./8188eu.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8188eu.ko || { echo "Failed to build external rtl8188eu module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8188eu module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8188eu || { echo "Failed to build external rtl8188eu module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8192eu ./chroot/tmp/ || { echo "Failed to build external rtl8192eu module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8192eu || { echo "Failed to build external rtl8192eu module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8192eu module for kernel $kernel"; exit 1; }
-cp ./8192eu.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8192eu.ko || { echo "Failed to build external rtl8192eu module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8192eu module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8192eu || { echo "Failed to build external rtl8192eu module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8723bu ./chroot/tmp/ || { echo "Failed to build external rtl8723bu module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8723bu || { echo "Failed to build external rtl8723bu module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8723bu module for kernel $kernel"; exit 1; }
-cp ./8723bu.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8723bu.ko || { echo "Failed to build external rtl8723bu module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8723bu module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8723bu || { echo "Failed to build external rtl8723bu module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8812au ./chroot/tmp/ || { echo "Failed to build external rtl8812au module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8812au || { echo "Failed to build external rtl8812au module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8812au module for kernel $kernel"; exit 1; }
-cp ./8812au.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8812au.ko || { echo "Failed to build external rtl8812au module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8812au module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8812au || { echo "Failed to build external rtl8812au module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8814au ./chroot/tmp/ || { echo "Failed to build external rtl8814au module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8814au || { echo "Failed to build external rtl8814au module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8814au module for kernel $kernel"; exit 1; }
-cp ./8814au.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8814au.ko || { echo "Failed to build external rtl8814au module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8814au module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8814au || { echo "Failed to build external rtl8814au module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8821ce ./chroot/tmp/ || { echo "Failed to build external rtl8821ce module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8821ce || { echo "Failed to build external rtl8821ce module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8821ce module for kernel $kernel"; exit 1; }
-cp ./8821ce.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8821ce.ko || { echo "Failed to build external rtl8821ce module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8821ce module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8821ce || { echo "Failed to build external rtl8821ce module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl8821cu ./chroot/tmp/ || { echo "Failed to build external rtl8821cu module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl8821cu || { echo "Failed to build external rtl8821cu module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl8821cu module for kernel $kernel"; exit 1; }
-cp ./8821cu.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl8821cu.ko || { echo "Failed to build external rtl8821cu module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8821cu module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl8821cu || { echo "Failed to build external rtl8821cu module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl88x2bu ./chroot/tmp/ || { echo "Failed to build external rtl88x2bu module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl88x2bu || { echo "Failed to build external rtl88x2bu module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" modules || { echo "Failed to build external rtl88x2bu module for kernel $kernel"; exit 1; }
-cp ./88x2bu.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl88x2bu.ko || { echo "Failed to build external rtl88x2bu module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl88x2bu module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl88x2bu || { echo "Failed to build external rtl88x2bu module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/rtl885xxx ./chroot/tmp/ || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/rtl885xxx || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-mkdir -p ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw89core.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw89core.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw89pci.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw89pci.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw_8852a.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw_8852a.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw_8852ae.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw_8852ae.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw_8852b.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw_8852b.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw_8852be.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw_8852be.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw_8852c.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw_8852c.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cp ./rtw_8852ce.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/rtl885xxx/rtw_8852ce.ko || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/rtl885xxx || { echo "Failed to build external rtl8852ae module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
+if [ "$kernel" == "6.1" ] || [ "$kernel" == "6.12" ]; then
 
 cp -r ./external-drivers/broadcom-wl ./chroot/tmp/ || { echo "Failed to build external broadcom-wl module for kernel $kernel"; exit 1; }
 cd ./chroot/tmp/broadcom-wl || { echo "Failed to build external broadcom-wl module for kernel $kernel"; exit 1; }
@@ -229,7 +122,7 @@ rm -r ./chroot/tmp/broadcom-wl || { echo "Failed to build external broadcom-wl m
 
 fi
 
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
+if [ "$kernel" == "6.1" ] || [ "$kernel" == "6.12" ]; then
 
 cp -r ./external-drivers/acpi_call ./chroot/tmp/ || { echo "Failed to build external acpi_call module for kernel $kernel"; exit 1; }
 cd ./chroot/tmp/acpi_call || { echo "Failed to build external acpi_call module for kernel $kernel"; exit 1; }
@@ -237,28 +130,6 @@ make -j"$NTHREADS" || { echo "Failed to build external acpi_call module for kern
 cp ./acpi_call.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/acpi_call.ko || { echo "Failed to build external acpi_call module for kernel $kernel"; exit 1; }
 cd ../../.. || { echo "Failed to build external acpi_call module for kernel $kernel"; exit 1; }
 rm -r ./chroot/tmp/acpi_call || { echo "Failed to build external acpi_call module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/ipts ./chroot/tmp/ || { echo "Failed to build external ipts module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/ipts || { echo "Failed to build external ipts module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" || { echo "Failed to build external ipts module for kernel $kernel"; exit 1; }
-cp ./src/ipts.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/ipts.ko || { echo "Failed to build external ipts module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external ipts module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/ipts || { echo "Failed to build external ipts module for kernel $kernel"; exit 1; }
-
-fi
-
-if [ "$kernel" == "6.6" ] || [ "$kernel" == "6.12" ]; then
-
-cp -r ./external-drivers/ithc ./chroot/tmp/ || { echo "Failed to build external ithc module for kernel $kernel"; exit 1; }
-cd ./chroot/tmp/ithc || { echo "Failed to build external ithc module for kernel $kernel"; exit 1; }
-make -j"$NTHREADS" || { echo "Failed to build external ithc module for kernel $kernel"; exit 1; }
-cp ./build/ithc.ko ../../../chroot/home/chronos/kernel/lib/modules/"$kernel_version"/ithc.ko || { echo "Failed to build external ithc module for kernel $kernel"; exit 1; }
-cd ../../.. || { echo "Failed to build external ithc module for kernel $kernel"; exit 1; }
-rm -r ./chroot/tmp/ithc || { echo "Failed to build external ithc module for kernel $kernel"; exit 1; }
 
 fi
 
@@ -273,7 +144,7 @@ rm -r ./chroot/tmp/kernel || { echo "Failed to cleanup for kernel $kernel"; exit
 done
 
 cd ./chroot/home/chronos || { echo "Failed to switch to chronos directory"; exit 1; }
-git clone --depth=1 -b v$(curl -L https://chromium.googlesource.com/chromiumos/overlays/chromiumos-overlay/+/refs/heads/release-$(cat ../../chromeos/etc/lsb-release | grep 'CHROMEOS_RELEASE_BUILDER_PATH=' | cut -d'/' -f2 | cut -d '.' -f1).B/media-libs/alsa-lib/ | sed 's@>@\n@g' | grep '^alsa-lib-' | head -1 | cut -d '-' -f3) https://github.com/alsa-project/alsa-ucm-conf.git || { echo "Failed to clone the alsa-ucm-conf git"; exit 1; }
+git clone --depth=1 -b v$(LD_LIBRARY_PATH=../../chromeos/lib64:../../chromeos/usr/lib64 ../../chromeos/lib64/ld-linux-x86-64.so.2 ../../chromeos/usr/bin/alsaucm --version | cut -d' ' -f3) https://github.com/alsa-project/alsa-ucm-conf.git || { echo "Failed to clone the alsa-ucm-conf git"; exit 1; }
 rm -r ./alsa-ucm-conf/.github ./alsa-ucm-conf/.gitignore ./alsa-ucm-conf/LICENSE ./alsa-ucm-conf/README.md ./alsa-ucm-conf/VERSION || { echo "Failed to clone the alsa-ucm-conf git"; exit 1; }
 sed -i 's@Define.V1 ""@Define.V1 yes@g' ./alsa-ucm-conf/ucm2/ucm.conf || { echo "Failed to modify ucm configuration"; exit 1; }
 cp -rT ../../chromeos/usr/share/alsa/ucm ./alsa-ucm-conf/ucm || { echo "Failed to copy ChromeOS ucm configurations"; exit 1; }
